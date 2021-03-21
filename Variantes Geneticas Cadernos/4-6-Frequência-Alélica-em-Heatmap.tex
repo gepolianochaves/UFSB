@@ -1,0 +1,609 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Caderno Computacional 4/6: Mesclagem de Arquivos VCF e Frequência Alélica de Polimorfismos de SARS-CoV-2},
+  pdfauthor={Gepoliano Chaves, Ph. D.},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{Caderno Computacional 4/6: Mesclagem de Arquivos VCF e Frequência
+Alélica de Polimorfismos de SARS-CoV-2}
+\author{Gepoliano Chaves, Ph. D.}
+\date{Setembro, 2020}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{5}
+\tableofcontents
+}
+\hypertarget{introduuxe7uxe3o}{%
+\section{Introdução}\label{introduuxe7uxe3o}}
+
+O Caderno 2 destinou-se a introduzir o conceito de Associação Biológica,
+através da associação estatística entre variantes localizadas nos genes
+de sortilinas e a Doença de Huntington. No Caderno 3, estudamos o
+formato do arquivo de sequência biológica do tipo FASTA. Também no
+Caderno 3, utilizamos um \emph{script} escrito em Bash para identificar
+variantes de SARS-CoV-2 associadas a uma região geográfica específica.
+
+Caso ainda não tenha conseguido executar comandos em Bash, ou mesmo
+instalar linux em sua máquina que usa o sistema operacional Windows, não
+se preocupe pois o contato inicial com pipelines computacionais pode
+exigir habilidades que nem todos possuimos de imediato. Portanto, a
+continuação do estudo nesta área requer persistência e dedicação na
+aprendizagem da sintaxe adequada a cada linguagem de programação e
+conhecimento dos sistemas operacionais das máquinas utilizadas por você.
+
+No presente Caderno, desejamos mesclar arquivos VCF provenientes da
+pipeline de identificação de variantes (\emph{Variant Call}) genômicas
+de SARS-CoV-2, produzidos no Caderno 2. A identificação dos
+polimorfismos de SARS-CoV-2 foi feita no Caderno Computacional 2/6,
+utilizando-se os arquivos FASTA provenientes da plataforma de dados
+GISAID. A necessidade de mesclar os arquivos VCF de cada amostra de
+SARS-CoV-2 vem de podermos continuar nosso estudo usando os arquivos VCF
+de duas formas. Na primeira maneira, comparamos as variantes que
+identificamos de modo a considerar nossas próprias hipóteses, o que
+poderia acontecer caso fôssemos um grupo de virologia tradicional, que
+trabalhasse com SARS-CoV-2 há algum tempo. Neste caso, poderíamos fazer
+análises que não necessitassem comparação com dados de grupos mais
+consolidados nesta área.
+
+Entretanto, como nosso estudo é exploratório, devemos seguir uma segunda
+rota, que inclui a comparação com dados de grupos que publicaram
+anteriormente sobre identificação de variantes de SARS-CoV, para
+eventualmente, fazermos as comparações científicas necessárias. Desta
+forma, pode ser vantajoso utilizarmos uma tabela de variantes de
+SARS-CoV-2 publicada por outros pesquisadores. O trabalho de Yin e
+colaboradores, publicado em 2020, traz uma tabela com as frequências de
+mutações encontradas por este grupo (Yin \emph{et al.}, 2020). Numa
+abordagem inicial de nosso estudo, desejamos incluir todas os SNPs
+indentificadas por Yin em uma tabela de frequência alélica, para
+comparação. Eventualmente, podemos desejar incluir todas as SNPs
+identificadas por nossa pipeline, ao invés de incluir apenas as SNPs de
+Yin \emph{et al.}.
+
+Durante o programa de Estágio de Verão, na Universidade da Califórnia em
+Santa Cruz em 2020, inicialmente construímos esta tabela de frequências
+usando o Bash, atraves do comando \emph{grep}. Nesta estratégia, a
+posição genômica é identificada diretamente do arquivo \emph{vcf}, que
+pode ser o arquivo VCF de cada amostra, ou o arquivo VCF contendo todas
+as amostras combinadas, com uma leve preferência pela primeira
+abordagem.
+
+Nenhuma destas abordagens, no entanto, parece eficaz. Suponho que uma
+abordagem mais eficiente possa ser oferecida por pacotes como SNPhylo,
+que parece conseguir plotar a árvore filogenética diretamente dos
+arquivos \emph{vcf}s provenientes da pipeline de \emph{Variant Call}.
+Para o futuro de nosso estudo, pode ser interessante fazer a analise
+filogenética usando o pacote SNPPhylo.
+
+Para uma intodução ao pacote snphylo, bem como visualização do
+\emph{workflow} que utiliza, visitar a \emph{home page} do projeto:
+
+\url{http://chibba.pgml.uga.edu/snphylo}
+
+Outro pacote que parece ser bastante útil seria VCF-kit. A \emph{home
+page} do pacote VCF-kit pode ser acessada em
+
+\url{https://vcf-kit.readthedocs.io/en/latest/}
+
+Abaixo, o diretório se chama Merged\_Autralia, porque comecei mesclando
+os arquivos VCF correspondentes à região da Austrália.
+
+\hypertarget{criar-pasta-para-armazenamento-de-arquivos-vcfs}{%
+\section{1) Criar pasta para Armazenamento de arquivos
+VCFs}\label{criar-pasta-para-armazenamento-de-arquivos-vcfs}}
+
+Podemos fazer do Rmd notebook uma plataforma de interacao com o nosso
+computador. A proxima linha de codigo, cria uma pasta ou diretorio no
+Desktop do meu computador (a hierarquia das pastas no seu sistema
+computacional determinara a linha exata a ser escrita abaixo). O
+estudante precisa descobrir como declarar o seu proprio Desktop na linha
+abaixo.
+
+\hypertarget{criar-pasta-para-arquivos-vcf}{%
+\subsection{1.1) Criar pasta para arquivos
+VCF}\label{criar-pasta-para-arquivos-vcf}}
+
+Na pasta criada, colocaremos todos os arquivos VCF. Este passo eh
+necessario para o passo 8 de mesclagem, abaixo. Crie a pasta onde serao
+armazenados os arquivos VCF.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mkdir}\NormalTok{ ~/Desktop/Australia_Merged}
+\end{Highlighting}
+\end{Shaded}
+
+Agora, precisamos copiar os nomes dos arquivos VCF com base na
+localizacao dos arquivos na corrente pasta. Usamos uma ``for loop'',
+onde cada pasta i, tera copiado (cp) o arquivo bwa\_aligned\_snps.vcf
+modificado para conter o nome da regiao de onde o arquivo eh proveniente
+(neste caso, Australia)
+
+\hypertarget{renomear-arquivos-vcf}{%
+\subsection{1.2) Renomear arquivos VCF}\label{renomear-arquivos-vcf}}
+
+Renomear dos arquivos VCF eh necessario pois foram todos produzidos como
+``bwa\_aligned\_snps.vcf'' pela pipeline GATK.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{for} \ExtensionTok{i}\NormalTok{ in Australia_EPI_ISL_416*}\KeywordTok{;} \KeywordTok{do}
+\FunctionTok{cp} \VariableTok{$i}\NormalTok{/bwa_aligned_snps.vcf }\VariableTok{$i}\NormalTok{/}\VariableTok{$\{i:0:24\}}\StringTok{"_bwa_aligned_snps.vcf"}\KeywordTok{;} \KeywordTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{uso-de-awk-para-isolar-o-nome-do-arquivo-de-interesse}{%
+\subsection{1.3) Uso de ``awk'' para isolar o nome do arquivo de
+interesse}\label{uso-de-awk-para-isolar-o-nome-do-arquivo-de-interesse}}
+
+Aqui, usamos a funcao ``echo'' para extrair uma lista contendo os
+arquivos VCF que pretendemos analisar. Esta lista sera usada no passo 8
+para mesclar os arquivos VCF. Este comando imprime o ``path'' ou caminho
+de localizacao do presente diretorio. No entanto, usamos uma barra como
+separador para o comando awk, de modo a podermos isolar o nome do
+arquivo como desejamos.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{for} \ExtensionTok{i}\NormalTok{ in Australia_EPI_ISL_416*/Australia*}\KeywordTok{;} \KeywordTok{do} \BuiltInTok{echo} \VariableTok{$i}\KeywordTok{;} \KeywordTok{done} \KeywordTok{|} \FunctionTok{awk}\NormalTok{ -F }\StringTok{'/'} \StringTok{'\{print $2\}'}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{mover-vcfs-para-pasta-criada-inicialmente}{%
+\subsection{1.4) Mover VCFs para pasta criada
+inicialmente}\label{mover-vcfs-para-pasta-criada-inicialmente}}
+
+Se os arquivos VCF ainda nao foram movidos para a pasta que criamos
+inicialmente, mova-os agora.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mv}\NormalTok{ Australia_EPI*/Australia* Australia_Merged}
+\BuiltInTok{cd}\NormalTok{ Australia_Merged}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{compressuxe3o-de-arquivos}{%
+\section{2) Compressão de Arquivos}\label{compressuxe3o-de-arquivos}}
+
+\hypertarget{instalauxe7uxe3o-de-bgzip-e-anaconda-e-compressuxe3o}{%
+\subsection{2.1) Instalação de bgzip e Anaconda e
+compressão}\label{instalauxe7uxe3o-de-bgzip-e-anaconda-e-compressuxe3o}}
+
+O programa bgzip precisa ser instalado para atender aos requerimentos do
+software bcftools. No servidor da UCSC, instalei bgzip com o comando
+abaixo. Eesse comando utiliza anaconda, uma ferramenta usada em Ciencia
+de Dados.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{conda}\NormalTok{ install -c bioconda tabix }
+\KeywordTok{for} \ExtensionTok{x}\NormalTok{ in }\VariableTok{$(}\FunctionTok{cat}\NormalTok{ Australia_files_list.txt}\VariableTok{)}\KeywordTok{;} \KeywordTok{do} \ExtensionTok{bgzip} \VariableTok{$x}\KeywordTok{;} \KeywordTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+Os arquivos agora são comprimidos para utilização por bcftools.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{for} \ExtensionTok{x}\NormalTok{ in }\VariableTok{$(}\FunctionTok{cat}\NormalTok{ Australia_files_list.txt}\VariableTok{)}\KeywordTok{;} \KeywordTok{do} \ExtensionTok{bgzip} \VariableTok{$x}\KeywordTok{;} \KeywordTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{indexamento}{%
+\subsection{2.2) Indexamento}\label{indexamento}}
+
+O indexamento também é requerido por bcftools
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{for} \ExtensionTok{x}\NormalTok{ in }\VariableTok{$(}\FunctionTok{cat}\NormalTok{ Australia_files_list.txt}\VariableTok{)}\KeywordTok{;} \KeywordTok{do} \ExtensionTok{tabix} \VariableTok{$x}\StringTok{".gz"}\KeywordTok{;} \KeywordTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{copiar-arquivos-vcfs-originais}{%
+\subsection{2.3) Copiar arquivos VCFs
+originais}\label{copiar-arquivos-vcfs-originais}}
+
+Os arquivos VCF foram usados no passo de indexamento. Assim eh
+necessario re-colocar os arquivos na pasta inicial para prosseguir com a
+etapa de mesclagem.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{for} \ExtensionTok{i}\NormalTok{ in Australia_EPI_ISL_416*}\KeywordTok{;} 
+\KeywordTok{do} \FunctionTok{cp} \VariableTok{$i}\NormalTok{/bwa_aligned_snps.vcf }\VariableTok{$i}\NormalTok{/}\VariableTok{$\{i:0:24\}}\StringTok{"_bwa_aligned_snps.vcf"}\KeywordTok{;} \KeywordTok{done}
+\FunctionTok{mv}\NormalTok{ Australia_EPI_ISL_416*/Australia* Australia_Merged}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{mesclagem-de-arquivos-vcf}{%
+\subsection{2.4) Mesclagem de arquivos
+VCF}\label{mesclagem-de-arquivos-vcf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{bcftools}\NormalTok{ merge --missing-to-ref --force-samples}
+
+\ExtensionTok{Australia_EPI_ISL_416412_bwa_aligned_snps.vcf.gz}
+\ExtensionTok{Australia_EPI_ISL_416413_bwa_aligned_snps.vcf.gz}
+\ExtensionTok{Australia_EPI_ISL_416414_bwa_aligned_snps.vcf.gz}
+\ExtensionTok{Australia_EPI_ISL_416415_bwa_aligned_snps.vcf.gz}
+\ExtensionTok{Australia_EPI_ISL_416514_bwa_aligned_snps.vcf.gz}
+\ExtensionTok{Australia_EPI_ISL_416515_bwa_aligned_snps.vcf.gz}
+\ExtensionTok{Australia_EPI_ISL_416516_bwa_aligned_snps.vcf.gz}
+\ExtensionTok{Australia_EPI_ISL_416517_bwa_aligned_snps.vcf.gz}
+\ExtensionTok{Australia_EPI_ISL_416518_bwa_aligned_snps.vcf.gz}
+
+\OperatorTok{>} \ExtensionTok{Australia_Merged.vcf}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{heatmap-e-agrupamento-hierarquico-hierarchical-clustering}{%
+\section{3) Heatmap e Agrupamento Hierarquico (Hierarchical
+Clustering)}\label{heatmap-e-agrupamento-hierarquico-hierarchical-clustering}}
+
+Aqui, começamos a observar como os diferentes genotipos do virus se
+dividem ao redor do globo, nas diferentes regioes geograficas. O Heatmap
+ilustra a frequencia de cada genotipo em diferentes regioes geograficas.
+
+\hypertarget{extrauxe7uxe3o-de-genotipos-descritos-em-yin-2020}{%
+\subsection{3.1) Extração de genotipos descritos em Yin
+2020}\label{extrauxe7uxe3o-de-genotipos-descritos-em-yin-2020}}
+
+Usamos uma ``for loop'' para extrair cada SNP do arquivo VCF.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{for} \ExtensionTok{x}\NormalTok{ in Australia_EPI_*}\KeywordTok{;} \KeywordTok{do} \FunctionTok{grep}\NormalTok{ SNP }\VariableTok{$x}\NormalTok{/bwa_aligned_snps.vcf}\KeywordTok{;} \KeywordTok{done}
+\KeywordTok{for} \ExtensionTok{x}\NormalTok{ in Australia_EPI_*}\KeywordTok{;} \KeywordTok{for} \ExtensionTok{y}\NormalTok{ in list}\KeywordTok{;} \KeywordTok{do} \FunctionTok{grep} \VariableTok{$y}\NormalTok{ vcf_file}\KeywordTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+Tambem extraimos um SNP de interesse usando o comando grep, ilustrado na
+ultima aula e no comando acima.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{grep}\NormalTok{ 12357 ~/COVID_BWA_Variant_Call/Australia_EPI_ISL_416412.fasta/bwa_aligned_snps.vcf}
+\end{Highlighting}
+\end{Shaded}
+
+Para extrair todas as variantes ao mesmo tempo, podemos usar o seguinte
+comando.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{grep}\NormalTok{ 11083 ~/COVID_BWA_Variant_Call/Australia_EPI_ISL*/bwa_aligned_snps.vcf}
+\end{Highlighting}
+\end{Shaded}
+
+O uso do asterisco, ou estrela, permite o computador entenda que
+queremos todos os arquivos que possuem o padrao Australia\_EPI\_ISL, na
+pasta \textasciitilde/COVID\_BWA\_Variant\_Call. Este padrao pode ser
+observado quando peco ao computador para listar todos os arquivos da
+pasta \textasciitilde/COVID\_BWA\_Variant\_Call/, que possuem o padrao
+Australia\_EPI\_ISL:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ls}\NormalTok{ ~/COVID_BWA_Variant_Call/Australia_EPI_ISL*}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{plotagem-de-heatmap}{%
+\subsection{3.2) Plotagem de Heatmap}\label{plotagem-de-heatmap}}
+
+\hypertarget{carregar-dados-de-frequencia-de-polimorfismos}{%
+\subsubsection{3.2.1) Carregar dados de frequencia de
+polimorfismos}\label{carregar-dados-de-frequencia-de-polimorfismos}}
+
+Vamos inicialmente, visualizar a tabela construida a partir da
+genotipagem de SARS-CoV-2 presente nos arquivos VCF. A genotipagem foi
+feita por meio da identificacao das SNPs nos diversos arquivos VCF. Uma
+vez que consigo contar em quantos arquivos VCF ha determinado SNP de
+interesse, consigo fazer uma mensuracao da frequencia desse SNP entre
+todos os arquivos VCF que analisei. A visualizacao abaixo eh feita
+usando-se o Linux (Bash).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{ ~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt}
+\FunctionTok{awk} \StringTok{'\{print $1\}'}\NormalTok{ ~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt}
+\end{Highlighting}
+\end{Shaded}
+
+A Tabela para Heatmap contém os valores das frequências das SNPs
+identificadas em SARS-CoV-2 em diferentes locais do mundo e pode ser
+construída usando a extração do genótipo SNP mostrada na etapa 3.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"pheatmap"}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(}\StringTok{"RColorBrewer"}\NormalTok{)}
+\KeywordTok{setwd}\NormalTok{(}\StringTok{"~/Desktop/Gepoliano/SIP2020/Code"}\NormalTok{)}
+
+\NormalTok{heatmap_table <-}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}\StringTok{"~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt"}\NormalTok{, }\DataTypeTok{row.names =} \DecValTok{1}\NormalTok{, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{sep =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)}
+\NormalTok{heatmap_table =}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(heatmap_table)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{plotagem-tabela-frequuxeancia-aluxe9lica-sem-normalizauxe7uxe3o}{%
+\subsubsection{3.2.2) Plotagem Tabela Frequência Alélica Sem
+Normalização}\label{plotagem-tabela-frequuxeancia-aluxe9lica-sem-normalizauxe7uxe3o}}
+
+Note que ao plotar o heatmap com os valores das frequencias ``crus'',
+ou, sem nenhuma normalizacao, nao observamos as frequencias das SNPs
+agrupando as sequencias de morcegos e pangolins, como seria esperado,
+considerando-as sequencias do Extremo Oriente. Como verao abaixo, a
+normalizacao permite que consigamos visualizar o agrupamento das
+sequencias de morcegos, pangolins e de virus isolados na
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"pheatmap"}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(}\StringTok{"RColorBrewer"}\NormalTok{)}
+\CommentTok{#setwd("~/Desktop/Gepoliano/SIP2020/Code")}
+
+\NormalTok{heatmap_table <-}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}\StringTok{"~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt"}\NormalTok{, }\DataTypeTok{row.names =} \DecValTok{1}\NormalTok{, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{sep =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)}
+\NormalTok{heatmap_table =}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(heatmap_table)}
+
+\CommentTok{# Escolher a cor do heatmap}
+\NormalTok{col.pal <-}\StringTok{ }\KeywordTok{brewer.pal}\NormalTok{(}\DecValTok{9}\NormalTok{,}\StringTok{"Blues"}\NormalTok{)}
+
+\CommentTok{# Definir o tipo de correlacao entre as amostras (colunas) e os genes (linhas)}
+\NormalTok{drows1 <-}\StringTok{ "euclidean"}
+\NormalTok{dcols1 <-}\StringTok{ "euclidean"}
+
+\CommentTok{#Plotar o heatmap, com as diversas opcoes determinadas}
+\NormalTok{hm.parameters <-}\StringTok{ }\KeywordTok{list}\NormalTok{(heatmap_table, }
+                      \DataTypeTok{color =}\NormalTok{ col.pal,}
+                      \DataTypeTok{cellwidth =} \DecValTok{14}\NormalTok{, }\DataTypeTok{cellheight =} \DecValTok{15}\NormalTok{, }\DataTypeTok{scale =} \StringTok{"none"}\NormalTok{,}
+                      \DataTypeTok{treeheight_row =} \DecValTok{200}\NormalTok{,}
+                      \DataTypeTok{kmeans_k =} \OtherTok{NA}\NormalTok{,}
+                      \DataTypeTok{show_rownames =}\NormalTok{ T, }\DataTypeTok{show_colnames =}\NormalTok{ T,}
+                      \CommentTok{#main = "Full heatmap (avg, eucl, unsc)",}
+                      \DataTypeTok{main =} \StringTok{"Frequencies of SNP Variants of SARS-CoV-2"}\NormalTok{,}
+                      \DataTypeTok{clustering_method =} \StringTok{"average"}\NormalTok{,}
+                      \DataTypeTok{cluster_rows =}\NormalTok{ F, }\DataTypeTok{cluster_cols =}\NormalTok{ T,}
+                      \DataTypeTok{clustering_distance_rows =}\NormalTok{ drows1, }
+                      \DataTypeTok{fontsize_row =} \DecValTok{12}\NormalTok{,}
+                      \DataTypeTok{fontsize_col =} \DecValTok{12}\NormalTok{,}
+                      \DataTypeTok{clustering_distance_cols =}\NormalTok{ dcols1)}
+\KeywordTok{do.call}\NormalTok{(}\StringTok{"pheatmap"}\NormalTok{, hm.parameters)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{4-6-Frequência-Alélica-em-Heatmap_files/figure-latex/heatmap1-1.pdf}
+
+\hypertarget{plotagem-tabela-frequuxeancia-aluxe9lica-com-normalizauxe7uxe3o}{%
+\subsubsection{3.2.3) Plotagem Tabela Frequência Alélica Com
+Normalização}\label{plotagem-tabela-frequuxeancia-aluxe9lica-com-normalizauxe7uxe3o}}
+
+A visualizacao do Heatmap pode ser normalizada utilisando-se a escala
+logaritmica. Tirar o logaritmo da representacao da expressao genica eh
+um procedimento padrao, pois ajuda a homogeneizar a variancia nas
+frequencias e reduzir a dimensionalidade na variancia na visializacao do
+heatmap. Devido a minha experiencia na visualizacao de expressao genica
+usando Heatmaps, decidi implementar tambem a normalizacao das
+frequencias alelicas dos genotipos identificados de SARS-CoV-2 neste
+projeto.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"pheatmap"}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(}\StringTok{"RColorBrewer"}\NormalTok{)}
+
+\NormalTok{heatmap_table <-}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}\StringTok{"~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt"}\NormalTok{, }\DataTypeTok{row.names =} \DecValTok{1}\NormalTok{, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{sep =} \StringTok{"}\CharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)}
+\NormalTok{heatmap_table =}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(heatmap_table)}
+
+\NormalTok{log_table_}\DecValTok{09}\NormalTok{_}\DecValTok{18}\NormalTok{_}\DecValTok{2020}\NormalTok{ =}\StringTok{ }\KeywordTok{log}\NormalTok{ (heatmap_table }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)}
+
+\CommentTok{# Escolher a cor do heatmap}
+\NormalTok{col.pal <-}\StringTok{ }\KeywordTok{brewer.pal}\NormalTok{(}\DecValTok{9}\NormalTok{,}\StringTok{"Blues"}\NormalTok{)}
+
+\CommentTok{# Definir o tipo de correlacao entre as amostras (colunas) e os genes (linhas)}
+\NormalTok{drows1 <-}\StringTok{ "euclidean"}
+\NormalTok{dcols1 <-}\StringTok{ "euclidean"}
+
+\CommentTok{#Plotar o heatmap, com as diversas opcoes determinadas}
+\NormalTok{hm.parameters <-}\StringTok{ }\KeywordTok{list}\NormalTok{(log_table_}\DecValTok{09}\NormalTok{_}\DecValTok{18}\NormalTok{_}\DecValTok{2020}\NormalTok{, }
+                      \DataTypeTok{color =}\NormalTok{ col.pal,}
+                      \DataTypeTok{cellwidth =} \DecValTok{14}\NormalTok{, }\DataTypeTok{cellheight =} \DecValTok{15}\NormalTok{, }\DataTypeTok{scale =} \StringTok{"none"}\NormalTok{,}
+                      \DataTypeTok{treeheight_row =} \DecValTok{200}\NormalTok{,}
+                      \DataTypeTok{kmeans_k =} \OtherTok{NA}\NormalTok{,}
+                      \DataTypeTok{show_rownames =}\NormalTok{ T, }\DataTypeTok{show_colnames =}\NormalTok{ T,}
+                      \CommentTok{#main = "Full heatmap (avg, eucl, unsc)",}
+                      \DataTypeTok{main =} \StringTok{"Frequencies of SNP Variants of SARS-CoV-2"}\NormalTok{,}
+                      \DataTypeTok{clustering_method =} \StringTok{"average"}\NormalTok{,}
+                      \DataTypeTok{cluster_rows =}\NormalTok{ F, }\DataTypeTok{cluster_cols =}\NormalTok{ T,}
+                      \DataTypeTok{clustering_distance_rows =}\NormalTok{ drows1, }
+                      \DataTypeTok{fontsize_row =} \DecValTok{12}\NormalTok{,}
+                      \DataTypeTok{fontsize_col =} \DecValTok{12}\NormalTok{,}
+                      \DataTypeTok{clustering_distance_cols =}\NormalTok{ dcols1)}
+\KeywordTok{do.call}\NormalTok{(}\StringTok{"pheatmap"}\NormalTok{, hm.parameters)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{visualizauxe7uxe3o-de-filogenias-usando-r}{%
+\section{4) Visualização de Filogenias usando
+R}\label{visualizauxe7uxe3o-de-filogenias-usando-r}}
+
+Nesta seção, usamos a aba ``phylo'' do projeto VCF-kit, a qual inclui
+instruções de como usar este pacote, para tentar visualizar as relações
+de variação entre sequências de SARS-CoV-2 diretamente a partir dos
+arquivos VCF. Para usar este programa, precisamos de um tipo especial de
+arquivo chamado Newick. Necessitamos então, transformar arquivos VCF, em
+Newick. Abaixo a plotagem é testada usando um arquivo Newick, o arquivo
+treefile.newick.
+
+\url{https://vcf-kit.readthedocs.io/en/latest/phylo/}
+
+\hypertarget{instalauxe7uxe3o-de-pacotes}{%
+\subsection{4.1) Instalação de
+Pacotes}\label{instalauxe7uxe3o-de-pacotes}}
+
+Para instalação de livrarias, o erro \emph{R version 3.5 or greater,
+install Bioconductor packages using BiocManager}
+
+aponta para a necessidade de utilização de BiocManager. Um exemplo do
+comando para instalação de BiocManager é a linha presente em minhas
+análises GSEA:
+
+BiocManager::install(``clusterProfiler'', version = ``3.8'')
+
+Com a linha abaixo, podemos determinar a versão do software que queremos
+usar.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"tidyverse"}\NormalTok{)}
+\NormalTok{BiocManager}\OperatorTok{::}\KeywordTok{install}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'ape'}\NormalTok{,}\StringTok{'phyloseq'}\NormalTok{,}\StringTok{'ggmap'}\NormalTok{), }\DataTypeTok{suppressUpdates =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{visualizauxe7uxe3o-do-arquivo-newick-teste}{%
+\subsection{4.2) Visualização do Arquivo Newick
+teste}\label{visualizauxe7uxe3o-do-arquivo-newick-teste}}
+
+Nesta parte, usamos o arquivo em formato newick. No caso abaixo, o
+arquivo pode ser encontrado no seguinte link:
+\url{http://etetoolkit.org/treeview/} .
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\KeywordTok{library}\NormalTok{(ape)}
+\KeywordTok{library}\NormalTok{(ggmap)}
+\KeywordTok{library}\NormalTok{(phyloseq)}
+
+\NormalTok{tree <-}\StringTok{ }\NormalTok{ape}\OperatorTok{::}\KeywordTok{read.tree}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{"~/Desktop/Gepoliano/UFSB/vcf-kit/treefile.newick"}\NormalTok{))}
+
+\CommentTok{# Optionally set an outgroup.}
+\CommentTok{# tree <- root(tree,outgroup = "outgroup", resolve.root = T)}
+
+\NormalTok{treeSegs <-}\StringTok{ }\NormalTok{phyloseq}\OperatorTok{::}\KeywordTok{tree_layout}\NormalTok{(}
+\NormalTok{                                phyloseq}\OperatorTok{::}\KeywordTok{phy_tree}\NormalTok{(tree),}
+                                \DataTypeTok{ladderize =}\NormalTok{ T}
+\NormalTok{                                )}
+
+\NormalTok{treeSegs}\OperatorTok{$}\NormalTok{edgeDT <-}\StringTok{ }\NormalTok{treeSegs}\OperatorTok{$}\NormalTok{edgeDT  }\OperatorTok{%>%}\StringTok{ }
+\StringTok{                   }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{edge.length =} 
+                                    \KeywordTok{ifelse}\NormalTok{(edge.length }\OperatorTok{<}\StringTok{ }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, edge.length)}
+\NormalTok{                                 , }\DataTypeTok{xright =}\NormalTok{ xleft }\OperatorTok{+}\StringTok{ }\NormalTok{edge.length}
+\NormalTok{                                 )}
+\NormalTok{edgeMap =}\StringTok{ }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ xleft, }\DataTypeTok{xend =}\NormalTok{ xright, }\DataTypeTok{y =}\NormalTok{ y, }\DataTypeTok{yend =}\NormalTok{ y)}
+\NormalTok{vertMap =}\StringTok{ }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ x, }\DataTypeTok{xend =}\NormalTok{ x, }\DataTypeTok{y =}\NormalTok{ vmin, }\DataTypeTok{yend =}\NormalTok{ vmax)}
+\NormalTok{labelMap <-}\StringTok{ }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ xright}\FloatTok{+0.0001}\NormalTok{, }\DataTypeTok{y =}\NormalTok{ y, }\DataTypeTok{label =}\NormalTok{ OTU)}
+
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ treeSegs}\OperatorTok{$}\NormalTok{edgeDT) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_segment}\NormalTok{(edgeMap) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_segment}\NormalTok{(vertMap, }\DataTypeTok{data =}\NormalTok{ treeSegs}\OperatorTok{$}\NormalTok{vertDT) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_text}\NormalTok{(labelMap, }\DataTypeTok{data =}\NormalTok{ dplyr}\OperatorTok{::}\KeywordTok{filter}\NormalTok{(treeSegs}\OperatorTok{$}\NormalTok{edgeDT, }\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(OTU)), }\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{hjust =} \FloatTok{-0.05}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\NormalTok{ggmap}\OperatorTok{::}\KeywordTok{theme_nothing}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{limits =} \KeywordTok{c}\NormalTok{(}
+    \KeywordTok{min}\NormalTok{(treeSegs}\OperatorTok{$}\NormalTok{edgeDT}\OperatorTok{$}\NormalTok{xleft)}\OperatorTok{-}\FloatTok{0.15}\NormalTok{,}
+    \KeywordTok{max}\NormalTok{(treeSegs}\OperatorTok{$}\NormalTok{edgeDT}\OperatorTok{$}\NormalTok{xright)}\OperatorTok{+}\FloatTok{0.15}
+\NormalTok{  ),}
+  \DataTypeTok{expand =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\end{document}

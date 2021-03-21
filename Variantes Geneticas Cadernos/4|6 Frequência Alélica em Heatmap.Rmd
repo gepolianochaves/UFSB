@@ -1,0 +1,334 @@
+---
+title: 'Caderno Computacional 4/6: Mesclagem de Arquivos VCF e Frequência Alélica
+  de Polimorfismos de SARS-CoV-2'
+author: "Gepoliano Chaves, Ph. D."
+date: "Setembro, 2020"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    number_sections: no
+    toc_depth: 5
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '5'
+  word_document:
+    toc: yes
+    toc_depth: '5'
+bibliography: bib_bulbul_1-34_references.bib
+---
+
+
+# Introdução
+
+O Caderno 2 destinou-se a introduzir o conceito de Associação Biológica, através da associação estatística entre variantes localizadas nos genes de sortilinas e a Doença de Huntington. No Caderno 3, estudamos o formato do arquivo de sequência biológica do tipo FASTA. Também no Caderno 3, utilizamos um *script* escrito em Bash para identificar variantes de SARS-CoV-2 associadas a uma região geográfica específica.
+
+Caso ainda não tenha conseguido executar comandos em Bash, ou mesmo instalar linux em sua máquina que usa o sistema operacional Windows, não se preocupe pois o contato inicial com pipelines computacionais pode exigir habilidades que nem todos possuimos de imediato. Portanto, a continuação do estudo nesta área requer persistência e dedicação na aprendizagem da sintaxe adequada a cada linguagem de programação e conhecimento dos sistemas operacionais das máquinas utilizadas por você.
+
+No presente Caderno, desejamos mesclar arquivos VCF provenientes da pipeline de identificação de variantes (*Variant Call*) genômicas de SARS-CoV-2, produzidos no Caderno 2. A identificação dos polimorfismos de SARS-CoV-2 foi feita no Caderno Computacional 2/6, utilizando-se os arquivos FASTA provenientes da plataforma de dados GISAID. A necessidade de mesclar os arquivos VCF de cada amostra de SARS-CoV-2 vem de podermos continuar nosso estudo usando os arquivos VCF de duas formas. Na primeira maneira, comparamos as variantes que identificamos de modo a considerar nossas próprias hipóteses, o que poderia acontecer caso fôssemos um grupo de virologia tradicional, que trabalhasse com SARS-CoV-2 há algum tempo. Neste caso, poderíamos fazer análises que não necessitassem comparação com dados de grupos mais consolidados nesta área. 
+
+Entretanto, como nosso estudo é exploratório, devemos seguir uma segunda rota, que inclui a comparação com dados de grupos que publicaram anteriormente sobre identificação de variantes de SARS-CoV, para eventualmente, fazermos as comparações científicas necessárias. Desta forma, pode ser vantajoso utilizarmos uma tabela de variantes de SARS-CoV-2 publicada por outros pesquisadores. O trabalho de Yin e colaboradores, publicado em 2020, traz uma tabela com as frequências de mutações encontradas por este grupo (Yin *et al.*, 2020). Numa abordagem inicial de nosso estudo, desejamos incluir todas os SNPs indentificadas por Yin em uma tabela de frequência alélica, para comparação. Eventualmente, podemos desejar incluir todas as SNPs identificadas por nossa pipeline, ao invés de incluir apenas as SNPs de Yin *et al.*.
+
+Durante o programa de Estágio de Verão, na Universidade da Califórnia em Santa Cruz em 2020, inicialmente construímos esta tabela de frequências usando o Bash, atraves do comando *grep*. Nesta estratégia, a posição genômica é identificada diretamente do arquivo *vcf*, que pode ser o arquivo VCF de cada amostra, ou o arquivo VCF contendo todas as amostras combinadas, com uma leve preferência pela primeira abordagem. 
+
+Nenhuma destas abordagens, no entanto, parece eficaz. Suponho que uma abordagem mais eficiente possa ser oferecida por pacotes como SNPhylo, que parece conseguir plotar a árvore filogenética diretamente dos arquivos *vcf*s provenientes da pipeline de *Variant Call*. Para o futuro de nosso estudo, pode ser interessante fazer a analise filogenética usando o pacote SNPPhylo.
+
+Para uma intodução ao pacote snphylo, bem como visualização do *workflow* que utiliza, visitar a *home page* do projeto:
+
+http://chibba.pgml.uga.edu/snphylo 
+
+Outro pacote que parece ser bastante útil seria VCF-kit. A *home page* do pacote VCF-kit pode ser acessada em
+
+https://vcf-kit.readthedocs.io/en/latest/
+
+Abaixo, o diretório se chama Merged_Autralia, porque comecei mesclando os arquivos VCF correspondentes à região da Austrália.
+
+
+# 1) Criar pasta para Armazenamento de arquivos VCFs
+
+Podemos fazer do Rmd notebook uma plataforma de interacao com o nosso computador. A proxima linha de codigo, cria uma pasta ou diretorio no Desktop do meu computador (a hierarquia das pastas no seu sistema computacional determinara a linha exata a ser escrita abaixo). O estudante precisa descobrir como declarar o seu proprio Desktop na linha abaixo.
+
+## 1.1) Criar pasta para arquivos VCF
+
+Na pasta criada, colocaremos todos os arquivos VCF. Este passo eh necessario para o passo 8 de mesclagem, abaixo. Crie a pasta onde serao armazenados os arquivos VCF.
+
+```{bash, eval = F}
+mkdir ~/Desktop/Australia_Merged
+```
+
+Agora, precisamos copiar os nomes dos arquivos VCF com base na localizacao dos arquivos na corrente pasta. Usamos uma "for loop", onde cada pasta i, tera copiado (cp) o arquivo bwa_aligned_snps.vcf modificado para conter o nome da regiao de onde o arquivo eh proveniente (neste caso, Australia)
+
+## 1.2) Renomear arquivos VCF
+
+Renomear dos arquivos VCF eh necessario pois foram todos produzidos como "bwa_aligned_snps.vcf" pela pipeline GATK.
+
+```{bash, eval = F}
+for i in Australia_EPI_ISL_416*; do
+cp $i/bwa_aligned_snps.vcf $i/${i:0:24}"_bwa_aligned_snps.vcf"; done
+```
+
+## 1.3) Uso de "awk" para isolar o nome do arquivo de interesse
+
+Aqui, usamos a funcao "echo" para extrair uma lista contendo os arquivos VCF que pretendemos analisar. Esta lista sera usada no passo 8 para mesclar os arquivos VCF. Este comando imprime o "path" ou caminho de localizacao do presente diretorio. No entanto, usamos uma barra como separador para o comando awk, de modo a podermos isolar o nome do arquivo como desejamos.
+
+```{bash, eval = F}
+for i in Australia_EPI_ISL_416*/Australia*; do echo $i; done | awk -F '/' '{print $2}'
+```
+
+## 1.4) Mover VCFs para pasta criada inicialmente
+
+Se os arquivos VCF ainda nao foram movidos para a pasta que criamos inicialmente, mova-os agora.
+```{bash, eval = F}
+mv Australia_EPI*/Australia* Australia_Merged
+cd Australia_Merged
+```
+
+# 2) Compressão de Arquivos
+
+## 2.1) Instalação de bgzip e Anaconda e compressão
+
+O programa bgzip precisa ser instalado para atender aos requerimentos do software bcftools. No servidor da UCSC, instalei bgzip com o comando abaixo. Eesse comando utiliza anaconda, uma ferramenta usada em Ciencia de Dados.
+
+```{bash, eval = F}
+conda install -c bioconda tabix 
+for x in $(cat Australia_files_list.txt); do bgzip $x; done
+```
+
+Os arquivos agora são comprimidos para utilização por bcftools.
+
+```{bash, eval = F}
+for x in $(cat Australia_files_list.txt); do bgzip $x; done
+```
+
+## 2.2) Indexamento
+
+O indexamento também é requerido por bcftools
+```{bash, eval = F}
+for x in $(cat Australia_files_list.txt); do tabix $x".gz"; done
+```
+
+## 2.3) Copiar arquivos VCFs originais
+
+Os arquivos VCF foram usados no passo de indexamento. Assim eh necessario re-colocar os arquivos na pasta inicial para prosseguir com a etapa de mesclagem.
+
+```{bash, eval = F}
+for i in Australia_EPI_ISL_416*; 
+do cp $i/bwa_aligned_snps.vcf $i/${i:0:24}"_bwa_aligned_snps.vcf"; done
+mv Australia_EPI_ISL_416*/Australia* Australia_Merged
+```
+
+## 2.4) Mesclagem de arquivos VCF
+
+```{bash, eval = F}
+bcftools merge --missing-to-ref --force-samples
+
+Australia_EPI_ISL_416412_bwa_aligned_snps.vcf.gz
+Australia_EPI_ISL_416413_bwa_aligned_snps.vcf.gz
+Australia_EPI_ISL_416414_bwa_aligned_snps.vcf.gz
+Australia_EPI_ISL_416415_bwa_aligned_snps.vcf.gz
+Australia_EPI_ISL_416514_bwa_aligned_snps.vcf.gz
+Australia_EPI_ISL_416515_bwa_aligned_snps.vcf.gz
+Australia_EPI_ISL_416516_bwa_aligned_snps.vcf.gz
+Australia_EPI_ISL_416517_bwa_aligned_snps.vcf.gz
+Australia_EPI_ISL_416518_bwa_aligned_snps.vcf.gz
+
+> Australia_Merged.vcf
+```
+
+# 3) Heatmap e Agrupamento Hierarquico (Hierarchical Clustering)
+
+Aqui, começamos a observar como os diferentes genotipos do virus se dividem ao redor do globo, nas diferentes regioes geograficas. O Heatmap ilustra a frequencia de cada genotipo em diferentes regioes geograficas.
+
+## 3.1) Extração de genotipos descritos em Yin 2020
+
+Usamos uma "for loop" para extrair cada SNP do arquivo VCF.
+
+```{bash, eval = F}
+for x in Australia_EPI_*; do grep SNP $x/bwa_aligned_snps.vcf; done
+for x in Australia_EPI_*; for y in list; do grep $y vcf_file;
+```
+
+Tambem extraimos um SNP de interesse usando o comando grep, ilustrado na ultima aula e no comando acima.
+
+```{bash, eval = F}
+grep 12357 ~/COVID_BWA_Variant_Call/Australia_EPI_ISL_416412.fasta/bwa_aligned_snps.vcf
+```
+
+Para extrair todas as variantes ao mesmo tempo, podemos usar o seguinte comando.
+
+```{bash, eval = F}
+grep 11083 ~/COVID_BWA_Variant_Call/Australia_EPI_ISL*/bwa_aligned_snps.vcf
+```
+
+O uso do asterisco, ou estrela, permite o computador entenda que queremos todos os arquivos que possuem o padrao Australia_EPI_ISL, na pasta  ~/COVID_BWA_Variant_Call. Este padrao pode ser observado quando peco ao computador para listar todos os arquivos da pasta ~/COVID_BWA_Variant_Call/, que possuem o padrao Australia_EPI_ISL:
+
+```{bash, eval = F}
+ls ~/COVID_BWA_Variant_Call/Australia_EPI_ISL*
+```
+
+
+## 3.2) Plotagem de Heatmap
+
+### 3.2.1) Carregar dados de frequencia de polimorfismos
+
+Vamos inicialmente, visualizar a tabela construida a partir da genotipagem de SARS-CoV-2 presente nos arquivos VCF. A genotipagem foi feita por meio da identificacao das SNPs nos diversos arquivos VCF. Uma vez que consigo contar em quantos arquivos VCF ha determinado SNP de interesse, consigo fazer uma mensuracao da frequencia desse SNP entre todos os arquivos VCF que analisei. A visualizacao abaixo eh feita usando-se o Linux (Bash).
+
+```{bash , eval = F}
+head ~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt
+awk '{print $1}' ~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt
+```
+
+
+A Tabela para Heatmap contém os valores das frequências das SNPs identificadas em SARS-CoV-2 em diferentes locais do mundo e pode ser construída usando a extração do genótipo SNP mostrada na etapa 3.
+
+```{r , eval = T}
+library("pheatmap")
+library("RColorBrewer")
+setwd("~/Desktop/Gepoliano/SIP2020/Code")
+
+heatmap_table <- read.table("~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt", row.names = 1, header = TRUE, sep = "\t")
+heatmap_table = as.matrix(heatmap_table)
+```
+
+### 3.2.2) Plotagem Tabela Frequência Alélica Sem Normalização
+
+Note que ao plotar o heatmap com os valores das frequencias "crus", ou, sem nenhuma normalizacao, nao observamos as frequencias das SNPs agrupando as sequencias de morcegos e pangolins, como seria esperado, considerando-as sequencias do Extremo Oriente. Como verao abaixo, a normalizacao permite que consigamos visualizar o agrupamento das sequencias de morcegos, pangolins e de virus isolados na
+
+```{r heatmap1,eval=T}
+library("pheatmap")
+library("RColorBrewer")
+#setwd("~/Desktop/Gepoliano/SIP2020/Code")
+
+heatmap_table <- read.table("~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt", row.names = 1, header = TRUE, sep = "\t")
+heatmap_table = as.matrix(heatmap_table)
+
+# Escolher a cor do heatmap
+col.pal <- brewer.pal(9,"Blues")
+
+# Definir o tipo de correlacao entre as amostras (colunas) e os genes (linhas)
+drows1 <- "euclidean"
+dcols1 <- "euclidean"
+
+#Plotar o heatmap, com as diversas opcoes determinadas
+hm.parameters <- list(heatmap_table, 
+                      color = col.pal,
+                      cellwidth = 14, cellheight = 15, scale = "none",
+                      treeheight_row = 200,
+                      kmeans_k = NA,
+                      show_rownames = T, show_colnames = T,
+                      #main = "Full heatmap (avg, eucl, unsc)",
+                      main = "Frequencies of SNP Variants of SARS-CoV-2",
+                      clustering_method = "average",
+                      cluster_rows = F, cluster_cols = T,
+                      clustering_distance_rows = drows1, 
+                      fontsize_row = 12,
+                      fontsize_col = 12,
+                      clustering_distance_cols = dcols1)
+do.call("pheatmap", hm.parameters)
+```
+
+
+
+### 3.2.3) Plotagem Tabela Frequência Alélica Com Normalização
+
+A visualizacao do Heatmap pode ser normalizada utilisando-se a escala logaritmica. Tirar o logaritmo da representacao da expressao genica eh um procedimento padrao, pois ajuda a homogeneizar a variancia nas frequencias e reduzir a dimensionalidade na variancia na visializacao do heatmap. Devido a minha experiencia na visualizacao de expressao genica usando Heatmaps, decidi implementar tambem a normalizacao das frequencias alelicas dos genotipos identificados de SARS-CoV-2 neste projeto.
+
+
+```{r heatmap2, eval= T}
+library("pheatmap")
+library("RColorBrewer")
+
+heatmap_table <- read.table("~/Desktop/Gepoliano/SIP2020/Code/temp_file.txt", row.names = 1, header = TRUE, sep = "\t")
+heatmap_table = as.matrix(heatmap_table)
+
+log_table_09_18_2020 = log (heatmap_table + 1)
+
+# Escolher a cor do heatmap
+col.pal <- brewer.pal(9,"Blues")
+
+# Definir o tipo de correlacao entre as amostras (colunas) e os genes (linhas)
+drows1 <- "euclidean"
+dcols1 <- "euclidean"
+
+#Plotar o heatmap, com as diversas opcoes determinadas
+hm.parameters <- list(log_table_09_18_2020, 
+                      color = col.pal,
+                      cellwidth = 14, cellheight = 15, scale = "none",
+                      treeheight_row = 200,
+                      kmeans_k = NA,
+                      show_rownames = T, show_colnames = T,
+                      #main = "Full heatmap (avg, eucl, unsc)",
+                      main = "Frequencies of SNP Variants of SARS-CoV-2",
+                      clustering_method = "average",
+                      cluster_rows = F, cluster_cols = T,
+                      clustering_distance_rows = drows1, 
+                      fontsize_row = 12,
+                      fontsize_col = 12,
+                      clustering_distance_cols = dcols1)
+do.call("pheatmap", hm.parameters)
+
+```
+
+# 4) Visualização de Filogenias usando R
+
+Nesta seção, usamos a aba "phylo" do projeto VCF-kit, a qual inclui instruções de como usar este pacote, para tentar visualizar as relações de variação entre sequências de SARS-CoV-2 diretamente a partir dos arquivos VCF. Para usar este programa, precisamos de um tipo especial de arquivo chamado Newick. Necessitamos então, transformar arquivos VCF, em Newick. Abaixo a plotagem é testada usando um arquivo Newick, o arquivo treefile.newick.
+
+https://vcf-kit.readthedocs.io/en/latest/phylo/
+
+## 4.1) Instalação de Pacotes
+
+Para instalação de livrarias, o erro *R version 3.5 or greater, install Bioconductor packages using BiocManager*
+
+aponta para a necessidade de utilização de BiocManager. Um exemplo do comando para instalação de BiocManager é a linha presente em minhas análises GSEA:
+
+BiocManager::install("clusterProfiler", version = "3.8")
+
+Com a linha abaixo, podemos determinar a versão do software que queremos usar.
+
+```{r, eval = F}
+install.packages("tidyverse")
+BiocManager::install(c('ape','phyloseq','ggmap'), suppressUpdates = TRUE)
+
+```
+
+## 4.2) Visualização do Arquivo Newick teste
+
+Nesta parte, usamos o arquivo em formato newick. No caso abaixo, o arquivo pode ser encontrado no seguinte link: http://etetoolkit.org/treeview/ .
+
+```{r Newick, warning=F, message=F, eval = F}
+library(tidyverse)
+library(ape)
+library(ggmap)
+library(phyloseq)
+
+tree <- ape::read.tree(paste0("~/Desktop/Gepoliano/UFSB/vcf-kit/treefile.newick"))
+
+# Optionally set an outgroup.
+# tree <- root(tree,outgroup = "outgroup", resolve.root = T)
+
+treeSegs <- phyloseq::tree_layout(
+                                phyloseq::phy_tree(tree),
+                                ladderize = T
+                                )
+
+treeSegs$edgeDT <- treeSegs$edgeDT  %>% 
+                   dplyr::mutate(edge.length = 
+                                    ifelse(edge.length < 0, 0, edge.length)
+                                 , xright = xleft + edge.length
+                                 )
+edgeMap = aes(x = xleft, xend = xright, y = y, yend = y)
+vertMap = aes(x = x, xend = x, y = vmin, yend = vmax)
+labelMap <- aes(x = xright+0.0001, y = y, label = OTU)
+
+ggplot(data = treeSegs$edgeDT) + geom_segment(edgeMap) + 
+  geom_segment(vertMap, data = treeSegs$vertDT) +
+  geom_text(labelMap, data = dplyr::filter(treeSegs$edgeDT, !is.na(OTU)), na.rm = TRUE, hjust = -0.05) +
+  ggmap::theme_nothing() + 
+  scale_x_continuous(limits = c(
+    min(treeSegs$edgeDT$xleft)-0.15,
+    max(treeSegs$edgeDT$xright)+0.15
+  ),
+  expand = c(0,0))
+```
+

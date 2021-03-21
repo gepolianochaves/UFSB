@@ -1,0 +1,32 @@
+PLINK v1.90p 64-bit (16 Jun 2020)
+Options in effect:
+  --fisher
+  --map /Users/gepolianochaves/Desktop/Gepoliano/UFSB/Arquivos/Labadorf_merged.map
+  --noweb
+  --ped /Users/gepolianochaves/Desktop/Gepoliano/UFSB/Arquivos/Labadorf_merged.ped
+
+Hostname: Gepolianos-MacBook-Pro.local
+Working directory: /Users/gepolianochaves/Desktop/Gepoliano/UFSB/Variantes Geneticas Notebooks
+Start time: Sat Jan 16 09:42:53 2021
+
+Note: --fisher flag deprecated.  Use "--assoc fisher" or "--model fisher".
+Note: --noweb has no effect since no web check is implemented yet.
+Random number seed: 1610811773
+16384 MB RAM detected; reserving 8192 MB for main workspace.
+Scanning .ped file... done.
+Performing single-pass .bed write (2690612 variants, 69 people).
+--file: plink-temporary.bed + plink-temporary.bim + plink-temporary.fam
+written.
+2690612 variants loaded from .bim file.
+69 people (0 males, 0 females, 69 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to plink.nosex .
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 69 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+treat these as missing.
+2690612 variants and 69 people pass filters and QC.
+Note: No phenotypes present.
+Warning: Skipping --assoc/--model since less than two phenotypes are present.
+
+End time: Sat Jan 16 09:42:59 2021

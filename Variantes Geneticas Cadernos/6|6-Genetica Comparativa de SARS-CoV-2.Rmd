@@ -1,0 +1,247 @@
+---
+title: 'Parte 1/4: Introdução à Análise Comparativa de Sequências Genômicas'
+author: "Gepoliano Chaves"
+date: "Outubro, 2020"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '5'
+  html_document:
+    df_print: paged
+    toc: yes
+    number_sections: no
+    toc_depth: 5
+    toc_float: yes
+  beamer_presentation: default
+  slidy_presentation: default
+  powerpoint_presentation:
+    toc: yes
+    reference_doc: template.pptx
+---
+
+# 1) Introdução
+
+
+## 1.1) Tabela de Conteudos do Mini-Curso
+
+
+### 1.1.1) Resultados Esperados
+
+Entre os objetivos deste curso, buscamos a familiarização dos alunos com análises computacionais e formação de grupo para desenvolvimento de projetos de pesquisa que visem estabelecer colaboração entre a Universidade de Chicago e a UFSB. Pretende-se que os estudantes entreguem ao final, um relatório com figuras geradas a partir da analise proposta do genoma viral. As figuras deverão explicitar a incidência de diferentes variantes genéticas de SARS-CoV-2 ao redor do globo.
+
+### 1.1.2) Programação do Curso
+
+Neste curso, pretende-se introduzir a noção de analise da informação contida na sequencia do RNA genomico viral, humano e outros, a partir da analise computacional. Para tal, iniciamos o ensino da analise de identificação de variantes em sequencias geneticas virais, disponíveis em plataformas publicas como GISAID e GEO. O codigo abaixo visa construir uma tabela de conteudo do mini-curso. Ele requer a instalação da livraria pander, como na linha comentada. Antes da instalação do pacote pander, o codigo nao pode ser executado como esperado. 
+
+A Tabela foi construida com base no seguinte endereco: 
+
+https://stackoverflow.com/questions/19997242/simple-manual-rmarkdown-tables-that-look-good-in-html-pdf-and-docx .
+
+
+```{r table-simple, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+#install.packages("pander")
+library(pander)
+require(pander)
+panderOptions('table.split.table', Inf)
+set.caption("Conteudo do Curso")
+my.data <- "
+  Atividade       | Descrição | Encontro 
+  
+  1 | Apresentação de conteúdo e Atividades Computacionais | 02/02/2021
+  2 | Descrição das quatro Atividades Computacionais | 04/02/2021
+  3 | Virus, Procariotos e Eucariotos | 09/02/2021
+  4 | Tipos de Sequenciamento de DNA: Sanger, NGS, Nanopore | 11/02/2021
+  5 | Introdução a Programação Computacional | 16/02/2021
+  6 | R, Python e Linux: Comandos comumente usados | 18/02/2021
+  7 | Identificação de Variantes Geneticas ou Polimorfismos de DNA | 23/02/2021
+  8 | GATK, the Genome Analysis Tool-Kit | 25/02/2021
+  9 | Gene Expression Omnibus e Samtools | 02/03/2021
+  10 | Arvores filogenéticas e parentesco evolutivo entre estirpes | 04/03/2021
+  11 | Estudo Longitudinal de Saude do Adulto (Projeto ELSA/Brasil) | 09/03/2021
+
+"
+df <- read.delim(textConnection(my.data),header=FALSE,sep="|",strip.white=TRUE,stringsAsFactors=FALSE)
+names(df) <- unname(as.list(df[1,])) # put headers on
+df <- df[-1,] # remove first row
+row.names(df)<-NULL
+pander(df, style = 'rmarkdown')
+```
+
+## 1.2) Objetivos do Modulo
+
+Neste módulo, introduzimos o conceito de programação nas Ciencias Genomicas. Utilizando o R, instalamos livrarias com pacotes para analise de sequencias de DNA (ou RNA). SARS-CoV-2 é um virus de RNA, porém ai analisar a sequencia do mesmo, a trataremos como DNA. Introduzimos também o primeiro de muitos tipos de arquivos usados em diferentes topicos de Biologia Computacional. As sequencias FASTA serao disponibilizadas pelo instrutor, mas podem também ser acessadas no site da base de dados GISAID, para os arquivos FASTA de SARS-CoV-2. Direcionamento para o site desta base de dados sera oferecido durante este curso.
+
+O objetivo deste módulo é instruir o estudante no inicio da analise de sequencias de DNA. Este material baseia-se em tutorial original publicado por Thibaut Jombart, do Imperial College London. Aquele tutorial, em inglês, inicialmente apresenta a Genetica comparativa de sequencias de virus da gripe isoladas nos EUA. Por meio desta introdução, pretende-se que o aluno se familiarize com a ideia de sequencias FASTA e como plotar arvores filogeneticas comparando a identidade das mesmas.
+O arquivo PDF original de Thibaut Jombart chama-se "MRC-session2-tuto.1.3.pdf" e pode ser encontrado no seguinte link:
+
+* http://adegenet.r-forge.r-project.org/files/MRC-session2-tuto.1.3.pdf
+
+# 2) Programação
+
+O principio da Programação de Computadores baseia-se na necessidade de analisar  quantidades muito grandes de dados as quais nao podem ser analisadas senao com o auxilio de tais maquinas de calculos. Este pricipio tambem foi introduzido nas Ciencias Biologicas onde a necessidade de testes estatisticos e matematicos conferiram a estas Ciencias, a acuracea e reprodutibilidade necessarias as sociedades industruais de producao em massa, notadamente as sociedades centrais do chamado Primeiro Mundo, principalmente os Estados Unidos da America.
+
+Principalmente devido aos esforcos que levaram ao termino do Projeto Genoma Humano no comeco deste seculo, a quantidade de dados gerados a partir do sequenciamento dos genomas de plantas, animais e humanos tornou-se absurdamente grande com o uso de tecnicas chamadas de *high throughput sequencing* (HTS) ou *next generation sequencing* (NGS). Neste sentido, apenas com o auxilio de programas computacionais, a natureza e a diversidade das sequencias geneticas de plantas, animais e seres humanos podem ser conhecidas e apreciadas de modo a trazer o conhecimento necessario ao melhoramento da qualidade de vida das sociedades e mitigacao de modificaçoes ambientais desnecessarias.
+
+Este curso apenas introduz conceitos basicos de  Programação Computacional como o uso de codigo para execucao de um comando, a instalação de livrarias, o uso de linguagens como R e Python, e a conversão do arquivo texto original escrito no R Markdown, convertido em *pdf* nos notebooks usados neste curso. Voce devera receber os *pdf*s bem como o arquivo de texto original escrito usando o R Markdown e comparar um ao outro afim de familiarizar-se com a ideia de codigo e execucao do comando. Podemos pensar no arquivo de R Markdown como o codigo, e o *pdf*, como a execucao dos comandos contidos no R Markdown. 
+
+# 3) Instalação de Livrarias
+
+## 3.1) Comando Geral
+
+É comum a necessidade de instalação de livrarias ou pacotes contendo programas no R. Estas livrarias ou pacotes contêm os passos necessarios para fazer uma análise, disponibilizados por outra pessoa, comumente os autores intelectuais dos pacotes. A partir da utilizacao destes pacotes, diferentes tipos de análise podem ser feitos e replicados por grupos independentes utilizando diversos modelos e dados, biologicos ou nao. O tutorial abaixo apresenta a maneira mais comum de se instalar uma livraria no R. Esta maneira é usando o comando install.packages(), como ilustrado abaixo.
+
+https://www.datacamp.com/community/tutorials/r-packages-guide
+
+Como pode ser visto, no tutorial, o comando abaixo permite a instalacao da livraria de interesse.
+
+```{r, eval = F}
+## Comando geral para instatacao de pacotes no R
+install.packages("package")
+## Instalacao de livrarias especificas para atividade de hoje
+install.packages("stats")
+install.packages("ade4")
+install.packages("ape")
+install.packages("adegenet")
+install.packages("phangorn")
+```
+
+## 3.2) Livrarias especificas para a atividade de hoje
+
+Aqui, nosso escopo encontra-se delimitado pela area da Biologia Computacional, Bioinformatica ou Bioquimica. As livrarias especificas abaixo, sao requisitadas com base no tutorial de Jombart.
+
+```{r, warning=F, message=FALSE}
+library(stats)
+library(ade4)
+library(ape)
+library(adegenet)
+library(phangorn)
+```
+# 4) Explorando o formato do arquivo FASTA
+
+Para estudo, as sequencias FASTA utilizadas originalmente em analise de genoma de Influenza disponibilizadas por Jombart, necessitam ser baixaadas. Dois arquivos contêm as as informações necessárias para a avaliação: usaflu.fasta, contendo as sequencias FASTA do virus da gripe, e usflu.annot.csv, contendo o nome da sequencia e o descritor da localização geografica de isolamento da sequência. O comando "head" existe no R e permite a visualizacao de determinado numero de linhas do arquivo de interesse. O comando abaixo permite a visualizacao das primeiras 30 linhas do arquivo FASTA: 
+
+```{bash}
+head -n 30 ~/Desktop/Gepoliano/UFSB/usaflu.fasta
+```
+
+Para contarmos quantas vezes o **nome** de uma sequencia FASTA aparece no nosso arquivo FASTA, usamos o comando grep, seguido de um padrao presente na primeira linha do arquivo FASTA. Cada sequencia FASTA tem o nome que aparece depois do sinal de "maior que" (>). Usar o sinal "maior que" (>) com grep, pode ser problematico pois este simbolo tambem e o simbolo para saida, usado pelo R. Acima, vimos que CY, aparece na primeira linha do arquivo FASTA). Assim, podemos procurar tanto pelos simbolos "CY", quanto pelos simbolos "E", e tambem, ">". A ressalva e que ">" precisa ser procurado utilisando-se uma sintaxe especial, como visto abaixo.
+
+```{bash}
+grep CY ~/Desktop/Gepoliano/UFSB/usaflu.fasta | wc -l
+grep E ~/Desktop/Gepoliano/UFSB/usaflu.fasta | wc -l
+grep -Ri -- '>' ~/Desktop/Gepoliano/UFSB/usaflu.fasta | wc -l
+```
+
+
+```{r, warning=F, message=FALSE }
+dna <- read.dna(file = "~/Desktop/Gepoliano/UFSB/usaflu.fasta", format = "fasta")
+object.size(as.character(dna))/object.size(dna)
+as.character(dna)[1:5, 1:10]
+annot <- read.csv("~/Desktop/Gepoliano/UFSB/usflu.annot.csv", header = TRUE, row.names = 1)
+## Visualizar annot
+annot
+table(annot$year)
+```
+# 5) Filogenia Baseada em Matriz de Distanciamento de pares de Influenza
+
+## 5.1) Matriz ou Heatmap de Influenza
+
+dist.dna é a funcao usada para calcular a distancia entre as amostras. Note que o parametro "model", abaixo, pode assumir diferentes valores, de acordo com a preferencia do usuario. D é a matriz de distancia, um objeto de classe "dist". Funcoes podem ser acessadas em R, digitando-se ?funcao, ou, no caso de dist.dna, ?dist.dna, para mais ajuda oferecida pelo R. Essas digitacoes sao feitas na parte do R chamada de Console.
+
+```{r, warning=F, message=FALSE}
+D <- dist.dna(dna, model = "TN93")
+class(D)
+length(D)
+temp <- as.data.frame(as.matrix(D))
+table.paint(temp, cleg = 0, clabel.row = 0.5, clabel.col = 0.5)
+temp <- t(as.matrix(D))
+temp <- temp[, ncol(temp):1]
+par(mar = c(1, 5, 5, 1))
+image(x = 1:80, y = 1:80, temp, 
+      col = rev(heat.colors(100)), 
+      xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+axis(side = 2, at = 1:80, lab = rownames(dna), las = 2, cex.axis = 0.5)
+```
+
+## 5.2) Arvore Filogenetica de Influenza
+
+A funcao nj( ) executa a estimacao da arvore juntada pelos vizinhos, de Saitou e Nei (1987).
+
+```{r, warning=F, message=F}
+tre <- nj(D)
+class(tre)
+plot(tre, cex = 0.6)
+title("Filogenia de Influenza (A simple NJ tree)")
+```
+
+# 6) Filogenia Baseada em Matriz de Distanciamento pares de SARS-CoV-2
+
+## 6.1) Matriz ou Heatmap de SARS-CoV-2
+
+Preparei os arquivos FASTA de SARS-CoV-2 de modo que tivessem o mesmo tamanho de sequencia. Inicialmente, devido a finalizacao de identificacao de genes em Neuroblastoma, consequi incluir apenas 4 sequencias de SARS-CoV-2 isoladas de pangolins chineses. Necessito ainda correr o alinhamento das outras sequencias e ver como posso transformar os arquivos FASTA de modo a terem o mesmo tamanho.
+
+## 6.2) Carregar dados no workspace R
+
+```{r, warning=F, message=FALSE}
+dna_SARS_CoV_2 <- read.dna(
+  file = "~/Desktop/Gepoliano/UFSB/WorldSARS-CoV-2_Exact_LengthPangolin.fasta", 
+  format = "fasta", as.matrix = TRUE)
+object.size(as.character(dna_SARS_CoV_2))/object.size(dna_SARS_CoV_2)
+
+## Anotacao com metadata das sequencias FASTA
+annot_SARS_CoV_2 <- read.csv(
+  "~/Desktop/Gepoliano/UFSB/SARS_CoV-2_World.annot.csv", 
+  header = TRUE, row.names = 1)
+
+annot_SARS_CoV_2
+
+## O seguinte comando permite visualizar o ano de isolamento da sequencia genetica.
+table(annot_SARS_CoV_2$year)
+
+```
+
+Agora, desejo usar a interface linux do R Markdown para visualizar o arquivo fasta acima. Ao executar o comando abaixo, poderemos visualizar a sequencia FASTA contendo todos os genomas de SARS-CoV-2.
+
+```{bash}
+head ~/Desktop/Gepoliano/UFSB/WorldSARS-CoV-2_Exact_LengthPangolin.fasta
+# head ~/Desktop/Gepoliano/UFSB/SARS_CoV-2_World.annot.csv
+```
+
+
+## 6.3) Matriz de Distanciamento de pares de SARS-CoV-2
+
+Esta parte produz o plot de uma matriz de distancia, mostrando o quanto cada amostra se assemelha as demais amostras da analise. Esta clusterizacao e semelhante a clusterizacao produzida entre as amostras usadas em Analise de Expressao Genica feita no DESeq2.
+
+```{r, warning=F, message=FALSE}
+D_SARS_CoV_2 <- dist.dna(dna_SARS_CoV_2, model = "TN93")
+class(D_SARS_CoV_2)
+length(D_SARS_CoV_2)
+temp <- as.data.frame(as.matrix(D_SARS_CoV_2))
+table.paint(temp, cleg = 0, clabel.row = 0.5, clabel.col = 0.5)
+```
+
+Note que para usar image para produzir plots similares, os dados precisam antes ser transformados; por exemplo:
+
+```{r, warning=F, message=FALSE, eval = F}
+temp <- t(as.matrix(D_SARS_CoV_2))
+temp <- temp[, ncol(temp):1]
+par(mar = c(1, 5, 5, 1))
+image(
+  x = 1:80, y = 1:80, 
+  temp, col = rev(heat.colors(100)), 
+  xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+axis(side = 2, at = 1:80, lab = rownames(dna_SARS_CoV_2), las = 2, cex.axis = 0.5)
+axis(side = 3, at = 1:80, lab = rownames(dna_SARS_CoV_2), las = 3, cex.axis = 0.5)
+```
+
+# 6.4) Construcao Arvore Filogenetica de SARS-CoV-2 com base na Matriz de Distanciamento de pares
+
+Finalmente plotamos a arvore filogenetica de SARS-CoV-2 e poderemos observar como as diferentes sequencias distribuidas ao redor do globo, se relacionam geneticamente, ou filogeneticamente.
+
+```{r, warning=F, message=FALSE}
+tre <- nj(D_SARS_CoV_2)
+class(tre)
+plot(tre, cex = 0.6, main = "Primeira Figura Filogenia de SARS-CoV-2")
+```
+
+
